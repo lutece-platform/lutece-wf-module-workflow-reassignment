@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+ 	<bean id="taskReassignmentConfigDAO"  class="fr.paris.lutece.plugins.workflow.modules.taskreassignment.business.TaskReassignmentConfigDAO"/>
+ 	
+ 	<bean id="workflow-reassignment.taskReassignment" class="fr.paris.lutece.plugins.workflow.business.task.TaskType" >
+ 	 		<property name="key" value="taskReassignment" />
+     		 <property name="titleI18nKey" value="module.workflow.taskreassignment.task_title" />
+    		 <property name="className" value="fr.paris.lutece.plugins.workflow.modules.taskreassignment.business.TaskReassignment"/>
+   	  </bean> 	
+</beans>
+ 	
