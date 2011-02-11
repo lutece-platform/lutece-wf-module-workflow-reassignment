@@ -45,6 +45,6 @@
     <scm>
         <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-reassignment</connection>
         <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-reassignment</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/portal/trunk/plugins/directory-form-workflow/module-workflow-reassignment</url>
+        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/directory-form-workflow/module-workflow-reassignment</url>
     </scm>
 </project>
