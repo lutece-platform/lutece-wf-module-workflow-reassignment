@@ -388,44 +388,37 @@ public class TaskReassignment extends Task
                 if ( ( workgroupConfig != null ) &&
                         ( workgroupConfig.getIdMailingList(  ) != WorkflowUtils.CONSTANT_ID_NULL ) )
                 {
-                    try
+                    Collection<Recipient> listRecipients = new ArrayList<Recipient>(  );
+                    listRecipients = AdminMailingListService.getRecipients( workgroupConfig.getIdMailingList(  ) );
+
+                    String strSenderEmail = MailService.getNoReplyEmail(  );
+
+                    HashMap<String, Object> model = new HashMap<String, Object>(  );
+                    model.put( MARK_MESSAGE, config.getMessage(  ) );
+
+                    HtmlTemplate t = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFICATION_MAIL, locale, model );
+
+                    if ( config.isUseUserName(  ) )
                     {
-                        Collection<Recipient> listRecipients = new ArrayList<Recipient>(  );
-                        listRecipients = AdminMailingListService.getRecipients( workgroupConfig.getIdMailingList(  ) );
+                        String strSenderName = I18nService.getLocalizedString( PROPERTY_MAIL_SENDER_NAME, locale );
 
-                        String strSenderEmail = MailService.getNoReplyEmail(  );
-
-                        HashMap<String, Object> model = new HashMap<String, Object>(  );
-                        model.put( MARK_MESSAGE, config.getMessage(  ) );
-
-                        HtmlTemplate t = AppTemplateService.getTemplate( TEMPLATE_TASK_NOTIFICATION_MAIL, locale, model );
-
-                        if ( config.isUseUserName(  ) )
+                        // Send Mail
+                        for ( Recipient recipient : listRecipients )
                         {
-                            String strSenderName = I18nService.getLocalizedString( PROPERTY_MAIL_SENDER_NAME, locale );
-
-                            // Send Mail
-                            for ( Recipient recipient : listRecipients )
-                            {
-                                // Build the mail message
-                                MailService.sendMailHtml( recipient.getEmail(  ), strSenderName, strSenderEmail,
-                                    config.getSubject(  ), t.getHtml(  ) );
-                            }
-                        }
-                        else
-                        {
-                            for ( Recipient recipient : listRecipients )
-                            {
-                                // Build the mail message
-                                MailService.sendMailHtml( recipient.getEmail(  ),
-                                    admin.getFirstName(  ) + " " + admin.getLastName(  ), admin.getEmail(  ),
-                                    config.getSubject(  ), t.getHtml(  ) );
-                            }
+                            // Build the mail message
+                            MailService.sendMailHtml( recipient.getEmail(  ), strSenderName, strSenderEmail,
+                                config.getSubject(  ), t.getHtml(  ) );
                         }
                     }
-                    catch ( Exception e )
+                    else
                     {
-                        AppLogService.error( "Error during notification: " + e.getMessage(  ) );
+                        for ( Recipient recipient : listRecipients )
+                        {
+                            // Build the mail message
+                            MailService.sendMailHtml( recipient.getEmail(  ),
+                                admin.getFirstName(  ) + " " + admin.getLastName(  ), admin.getEmail(  ),
+                                config.getSubject(  ), t.getHtml(  ) );
+                        }
                     }
                 }
             }
