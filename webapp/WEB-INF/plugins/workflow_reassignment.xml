@@ -2,7 +2,7 @@
     <!-- Plugin Informations -->
     <name>workflow-reassignment</name>
     <class>fr.paris.lutece.plugins.workflow.modules.taskreassignment.service.ReassignmentPlugin</class>
-    <version>1.0.2</version>
+    <version>2.0.0</version>
     <documentation/>
     <installation/>
     <changes/>
