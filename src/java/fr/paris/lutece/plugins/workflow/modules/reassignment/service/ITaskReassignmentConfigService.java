@@ -31,46 +31,56 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.taskreassignment.business;
+package fr.paris.lutece.plugins.workflow.modules.reassignment.service;
 
+import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig;
 import fr.paris.lutece.portal.service.plugin.Plugin;
+
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
- * ITaskAssignmentConfigDAO
+ *
+ * ITaskReassignmentConfigService
  *
  */
-public interface ITaskReassignmentConfigDAO
+public interface ITaskReassignmentConfigService
 {
     /**
-     * Insert a new record in the table.
-     *
-     * @param config instance of the TaskReassignmentConfig object to insert
-     * @param plugin the plugin
-     */
-    void insert( TaskReassignmentConfig config, Plugin plugin );
+    * Creation of an instance of config
+    * @param config The instance of task which contains the informations to store
+    * @param plugin the plugin
+    * @param workflowPlugin the plugin workflow
+    */
+    @Transactional( "workflow-reassignment.transactionManager" )
+    void create( TaskReassignmentConfig config, Plugin plugin, Plugin workflowPlugin );
 
     /**
-     * update record in the table.
-     *
-     * @param  config instance of config object to update
-     * @param plugin the plugin
+     * Update of task which is specified in parameter
+     * @param  config The instance of config which contains the informations to update
+     * @param plugin the Plugin
+     * @param workflowPlugin the plugin workflow
      */
-    void store( TaskReassignmentConfig config, Plugin plugin );
+    @Transactional( "workflow-reassignment.transactionManager" )
+    void update( TaskReassignmentConfig config, Plugin plugin, Plugin workflowPlugin );
 
     /**
-     * Load the config Object
+     * Remove config associated to the task which is specified in parameter
+     * @param nIdTask The task key
+     * @param plugin the Plugin
+     * @param workflowPlugin the plugin workflow
+     */
+    @Transactional( "workflow-reassignment.transactionManager" )
+    void remove( int nIdTask, Plugin plugin, Plugin workflowPlugin );
+
+    // Finders
+
+    /**
+     * Load the Config Object
      * @param nIdTask the task id
      * @param plugin the plugin
-     * @return the TaskReassignmentConfig object
-     *
+     * @param workflowPlugin the plugin workflow
+     * @return the Config Object
      */
-    TaskReassignmentConfig load( int nIdTask, Plugin plugin );
-
-    /**
-     * Delete the config Object
-     * @param nIdTask the task id
-     * @param plugin the plugin
-     */
-    void delete( int nIdTask, Plugin plugin );
+    TaskReassignmentConfig findByPrimaryKey( int nIdTask, Plugin plugin, Plugin workflowPlugin );
 }

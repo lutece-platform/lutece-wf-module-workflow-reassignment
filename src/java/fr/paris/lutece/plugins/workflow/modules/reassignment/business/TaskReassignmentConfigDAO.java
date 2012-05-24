@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.taskreassignment.business;
+package fr.paris.lutece.plugins.workflow.modules.reassignment.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -39,7 +39,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 
 /**
  *
- *class   TaskAssignmentConfigDAO
+ * TaskReassignmentConfigDAO
  *
  */
 public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
@@ -52,10 +52,10 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
         "SET id_task=?, title=?, is_notify=?, message = ?, subject = ?, is_use_user_name = ? " + " WHERE id_task=? ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_reassignment_cf  WHERE id_task=? ";
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.taskassignment.business.ITaskAssignmentConfigDAO#insert(fr.paris.lutece.plugins.workflow.modules.taskassignment.business.TaskAssignmentConfig, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public synchronized void insert( TaskReassignmentConfig config, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -73,9 +73,10 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
         daoUtil.free(  );
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.workflow.modules.taskassignment.business.ITaskAssignmentConfigDAO#store(fr.paris.lutece.plugins.workflow.modules.taskassignment.business.TaskAssignmentConfig, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void store( TaskReassignmentConfig config, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
@@ -94,10 +95,10 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.taskassignment.business.ITaskAssignmentConfigDAO#load(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public TaskReassignmentConfig load( int nIdTask, Plugin plugin )
     {
         TaskReassignmentConfig config = null;
@@ -125,10 +126,10 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
         return config;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.workflow.modules.taskassignment.business.ITaskAssignmentConfigDAO#delete(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void delete( int nIdTask, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );

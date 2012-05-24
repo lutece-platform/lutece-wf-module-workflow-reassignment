@@ -31,16 +31,16 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.taskreassignment.business;
+package fr.paris.lutece.plugins.workflow.modules.reassignment.business;
 
-import fr.paris.lutece.plugins.workflow.modules.taskassignment.business.WorkgroupConfig;
+import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
 
 import java.util.List;
 
 
 /**
  *
- *TaskCommentConfig
+ * TaskReassignmentConfig
  *
  */
 public class TaskReassignmentConfig
@@ -54,8 +54,8 @@ public class TaskReassignmentConfig
     private boolean _bUseUserName;
 
     /**
-         * @return the _bUseUserName
-         */
+     * @return the _bUseUserName
+     */
     public boolean isUseUserName(  )
     {
         return _bUseUserName;
@@ -94,11 +94,11 @@ public class TaskReassignmentConfig
     }
 
     /**
-     * @param notification the _bNotification to set
+     * @param bNotify the _bNotify to set
      */
-    public void setNotify( boolean notify )
+    public void setNotify( boolean bNotify )
     {
-        _bNotify = notify;
+        _bNotify = bNotify;
     }
 
     /**
@@ -118,18 +118,16 @@ public class TaskReassignmentConfig
     }
 
     /**
-    *
-    * @return the task id
-    */
+     * @return the task id
+     */
     public int getIdTask(  )
     {
         return _nIdTask;
     }
 
     /**
-     *
      * @param idTask the task id
-      */
+     */
     public void setIdTask( int idTask )
     {
         _nIdTask = idTask;
@@ -154,9 +152,8 @@ public class TaskReassignmentConfig
     }
 
     /**
-    *
-    * @return a list wich contains the differents workgroups to displayed in task form
-    */
+     * @return a list wich contains the differents workgroups to displayed in task form
+     */
     public List<WorkgroupConfig> getWorkgroups(  )
     {
         return _workgroups;

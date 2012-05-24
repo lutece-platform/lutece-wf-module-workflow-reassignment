@@ -1,8 +1,8 @@
 
 <div>
-  <h2> #i18n{module.workflow.taskreassignment.task_config.title}</h2> 	
+  <h2> #i18n{module.workflow.reassignment.task_config.title}</h2> 	
 	  	<p>
-	    	<label for="title">#i18n{module.workflow.taskreassignment.task_config.label_title} * :</label>
+	    	<label for="title">#i18n{module.workflow.reassignment.task_config.label_title} * :</label>
 	    		<#if config?exists && config.title??>
 		     			<input type="text" name="title" id="" size="80" value="${config.title}"  maxlength="255"/>
 		     	<#else>
@@ -10,10 +10,10 @@
 		     	</#if>	
 		    <br/>
 			<label>&nbsp;</label>
-			#i18n{module.workflow.taskreassignment.task_config.label_title}
+			#i18n{module.workflow.reassignment.task_config.label_title}
 		</p>		 
 		<p>
-	 		<label for="is_notify">#i18n{module.workflow.taskautomaticassignment.task_config.label_notification} :</label>
+	 		<label for="is_notify">#i18n{module.workflow.assignment.task_assignment_config.label_notification} :</label>
 	 		<#if config?exists && config.notify>
 	 			<input type="checkbox" name="is_notify" value="1" checked="checked" onclick="javascript:notification(); " />
    		 	<#else>
@@ -23,7 +23,7 @@
 		</p>
 		<div id="notification">
 		 	<p>
-				 <label for="is_use_user_name">#i18n{module.workflow.taskassignment.task_assignment_config.label_user_name} :</label>
+				 <label for="is_use_user_name">#i18n{module.workflow.assignment.task_assignment_config.label_user_name} :</label>
 	   		 		<#if config?exists&&config.useUserName>
 	   		 			<input name="is_use_user_name" value="1" type="checkbox" checked="checked"/>
 	   		 		<#else>
@@ -31,10 +31,10 @@
 	   		 		</#if>
 	   				<br/>
 	   				 <label>&nbsp;</label>
-				#i18n{module.workflow.taskassignment.task_assignment_config.label_user_name_comment}
+				#i18n{module.workflow.assignment.task_assignment_config.label_user_name_comment}
 		 	</p>
 		 	<p>
-		    	<label for="suject">#i18n{module.workflow.taskassignment.task_assignment_config.label_subject} * :</label>
+		    	<label for="suject">#i18n{module.workflow.assignment.task_assignment_config.label_subject} * :</label>
 			    	<#if config?exists&&config.subject?exists>
 			     			<input type="text" name="subject" id="" size="80" value="${config.subject}"  maxlength="255"/>
 			     	<#else>
@@ -42,10 +42,10 @@
 			     	</#if>		
 				   <br/>
 				  <label>&nbsp;</label>
-				#i18n{module.workflow.taskassignment.task_assignment_config.label_subject_comment}
+				#i18n{module.workflow.assignment.task_assignment_config.label_subject_comment}
 			</p>
 		 	<p>
-		    	<label for="message">#i18n{module.workflow.taskassignment.task_assignment_config.label_message} * :</label>
+		    	<label for="message">#i18n{module.workflow.assignment.task_assignment_config.label_message} * :</label>
 			    	<#if config?exists&&config.message?exists>
 			     			<textarea name="message" id="" rows="5" cols="80">${config.message}</textarea>
 			     	<#else>
@@ -53,7 +53,7 @@
 			     	</#if>		
 				   <br/>
 				  <label>&nbsp;</label>
-				#i18n{module.workflow.taskassignment.task_assignment_config.label_message_comment}
+				#i18n{module.workflow.assignment.task_assignment_config.label_message_comment}
 			</p>	
 			<#list workgroup_list as workgroup>
 		    	<p>
@@ -61,11 +61,11 @@
 					<div style="float:left;">
 						<input type="checkbox" class="checkbox" name="workgroups" value="${workgroup.item.key}"
 							<#if workgroup.config?exists> checked="checked" </#if> />
-						${workgroup.item.description}
+						${workgroup.item.description!}
 					</div>
 					<div id="div_${workgroup.item.key}" style="padding-top:3px;">
 						&nbsp;&nbsp;&nbsp;&nbsp;
-						#i18n{module.workflow.taskassignment.task_assignment_config.label_notification} :
+						#i18n{module.workflow.assignment.task_assignment_config.label_notification} :
 						<#if workgroup.config?exists>
 							<@combo name="id_mailing_list_${workgroup.item.key}" items=mailing_list default_value=workgroup.config.idMailingList />
 						<#else>

@@ -31,7 +31,8 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.taskreassignment.service;
+package fr.paris.lutece.plugins.workflow.modules.reassignment.service;
+
 
 /*
  * Copyright (c) 2002-2012, Mairie de Paris
@@ -77,11 +78,4 @@ import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 public class ReassignmentPlugin extends PluginDefaultImplementation
 {
     public static final String PLUGIN_NAME = "workflow-reassignment";
-
-    /**
-     * Initialize the module  reassignment
-     */
-    public void init(  )
-    {
-    }
 }
