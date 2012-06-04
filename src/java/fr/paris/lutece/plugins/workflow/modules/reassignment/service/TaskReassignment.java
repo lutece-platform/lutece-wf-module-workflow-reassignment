@@ -38,12 +38,12 @@ import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupCon
 import fr.paris.lutece.plugins.workflow.modules.assignment.service.IAssignmentHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.assignment.service.IWorkgroupConfigService;
 import fr.paris.lutece.plugins.workflow.modules.comment.business.TaskCommentConfig;
-import fr.paris.lutece.plugins.workflow.modules.comment.service.ITaskCommentConfigService;
 import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.task.Task;
@@ -68,6 +68,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -91,11 +92,16 @@ public class TaskReassignment extends Task
     // MESSAGES
     private static final String PROPERTY_MAIL_SENDER_NAME = "module.workflow.assignment.task_assignment_config.mailSenderName";
 
+    // BEANS
+    private static final String BEAN_COMMENT_CONFIG_SERVICE = "workflow.taskCommentConfigService";
+
     // SERVICES
     @Inject
-    private ITaskReassignmentConfigService _taskReassignementConfigService;
+    @Named( TaskReassignmentConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskReassignementConfigService;
     @Inject
-    private ITaskCommentConfigService _taskCommentConfigService;
+    @Named( BEAN_COMMENT_CONFIG_SERVICE )
+    private ITaskConfigService _taskCommentConfigService;
     @Inject
     private IAssignmentHistoryService _assignmentHistoryService;
     @Inject
@@ -120,12 +126,10 @@ public class TaskReassignment extends Task
     public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
     {
         Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
-        Plugin reassignPlugin = PluginService.getPlugin( ReassignmentPlugin.PLUGIN_NAME );
         String[] tabWorkgroups = request.getParameterValues( PARAMETER_WORKGROUPS + "_" + this.getId(  ) );
         AdminUser admin = AdminUserService.getAdminUser( request );
         List<String> listWorkgroup = new ArrayList<String>(  );
-        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( this.getId(  ),
-                reassignPlugin, workflowPlugin );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( this.getId(  ) );
 
         for ( int i = 0; i < tabWorkgroups.length; i++ )
         {
@@ -195,11 +199,10 @@ public class TaskReassignment extends Task
     @Override
     public void doRemoveConfig(  )
     {
-        Plugin reassignPlugin = PluginService.getPlugin( ReassignmentPlugin.PLUGIN_NAME );
         Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
 
         //remove config
-        _taskReassignementConfigService.remove( this.getId(  ), reassignPlugin, workflowPlugin );
+        _taskReassignementConfigService.remove( this.getId(  ) );
 
         //remove task information
         _assignmentHistoryService.removeByTask( this.getId(  ), workflowPlugin );
@@ -222,10 +225,7 @@ public class TaskReassignment extends Task
     @Override
     public String getTitle( Locale locale )
     {
-        Plugin reassignPlugin = PluginService.getPlugin( ReassignmentPlugin.PLUGIN_NAME );
-        Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
-        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( this.getId(  ),
-                reassignPlugin, workflowPlugin );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( this.getId(  ) );
 
         if ( config != null )
         {
@@ -242,8 +242,7 @@ public class TaskReassignment extends Task
     public Map<String, String> getTaskFormEntries( Locale locale )
     {
         Map<String, String> mapListEntriesform = null;
-        Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
-        TaskCommentConfig config = _taskCommentConfigService.findByPrimaryKey( this.getId(  ), workflowPlugin );
+        TaskCommentConfig config = _taskCommentConfigService.findByPrimaryKey( this.getId(  ) );
 
         if ( config != null )
         {

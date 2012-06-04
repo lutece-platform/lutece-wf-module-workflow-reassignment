@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.reassignment.business;
 
 import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
+import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
 
 import java.util.List;
 
@@ -43,9 +44,8 @@ import java.util.List;
  * TaskReassignmentConfig
  *
  */
-public class TaskReassignmentConfig
+public class TaskReassignmentConfig extends TaskConfig
 {
-    private int _nIdTask;
     private String _strTitle;
     private List<WorkgroupConfig> _workgroups;
     private String _strMessage;
@@ -115,22 +115,6 @@ public class TaskReassignmentConfig
     public void setMessage( String message )
     {
         _strMessage = message;
-    }
-
-    /**
-     * @return the task id
-     */
-    public int getIdTask(  )
-    {
-        return _nIdTask;
-    }
-
-    /**
-     * @param idTask the task id
-     */
-    public void setIdTask( int idTask )
-    {
-        _nIdTask = idTask;
     }
 
     /**

@@ -67,7 +67,9 @@ package fr.paris.lutece.plugins.workflow.modules.reassignment.service;
  *
  * License 1.0
  */
+import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 
 
 /**
@@ -78,4 +80,14 @@ import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 public class ReassignmentPlugin extends PluginDefaultImplementation
 {
     public static final String PLUGIN_NAME = "workflow-reassignment";
+    public static final String BEAN_TRANSACTION_MANAGER = PLUGIN_NAME + ".transactionManager";
+
+    /**
+     * Get the plugin
+     * @return the plugin
+     */
+    public static Plugin getPlugin(  )
+    {
+        return PluginService.getPlugin( PLUGIN_NAME );
+    }
 }

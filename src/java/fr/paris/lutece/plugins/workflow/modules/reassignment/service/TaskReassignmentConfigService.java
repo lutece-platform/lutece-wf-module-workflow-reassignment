@@ -35,9 +35,10 @@ package fr.paris.lutece.plugins.workflow.modules.reassignment.service;
 
 import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
 import fr.paris.lutece.plugins.workflow.modules.assignment.service.IWorkgroupConfigService;
-import fr.paris.lutece.plugins.workflow.modules.reassignment.business.ITaskReassignmentConfigDAO;
 import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig;
-import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
+import fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,10 +52,9 @@ import javax.inject.Inject;
  * TaskReassignmentConfigService
  *
  */
-public class TaskReassignmentConfigService implements ITaskReassignmentConfigService
+public class TaskReassignmentConfigService extends TaskConfigService
 {
-    @Inject
-    private ITaskReassignmentConfigDAO _taskReassignmentConfigDAO;
+    public static final String BEAN_SERVICE = "workflow-reassignment.taskReassignmentConfigService";
     @Inject
     private IWorkgroupConfigService _workgroupConfigService;
 
@@ -62,18 +62,23 @@ public class TaskReassignmentConfigService implements ITaskReassignmentConfigSer
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-reassignment.transactionManager" )
-    public void create( TaskReassignmentConfig config, Plugin plugin, Plugin workflowPlugin )
+    @Transactional( ReassignmentPlugin.BEAN_TRANSACTION_MANAGER )
+    public void create( ITaskConfig config )
     {
-        _taskReassignmentConfigDAO.insert( config, plugin );
+        super.create( config );
 
-        List<WorkgroupConfig> listWorkgroups = config.getWorkgroups(  );
+        TaskReassignmentConfig reassignmentConfig = getConfigBean( config );
 
-        if ( listWorkgroups != null )
+        if ( reassignmentConfig != null )
         {
-            for ( WorkgroupConfig workgroupConfig : listWorkgroups )
+            List<WorkgroupConfig> listWorkgroups = reassignmentConfig.getWorkgroups(  );
+
+            if ( listWorkgroups != null )
             {
-                _workgroupConfigService.create( workgroupConfig, workflowPlugin );
+                for ( WorkgroupConfig workgroupConfig : listWorkgroups )
+                {
+                    _workgroupConfigService.create( workgroupConfig, WorkflowUtils.getPlugin(  ) );
+                }
             }
         }
     }
@@ -82,20 +87,25 @@ public class TaskReassignmentConfigService implements ITaskReassignmentConfigSer
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-reassignment.transactionManager" )
-    public void update( TaskReassignmentConfig config, Plugin plugin, Plugin workflowPlugin )
+    @Transactional( ReassignmentPlugin.BEAN_TRANSACTION_MANAGER )
+    public void update( ITaskConfig config )
     {
-        _taskReassignmentConfigDAO.store( config, plugin );
+        super.update( config );
         // Update workgroups
-        _workgroupConfigService.removeByTask( config.getIdTask(  ), workflowPlugin );
+        _workgroupConfigService.removeByTask( config.getIdTask(  ), WorkflowUtils.getPlugin(  ) );
 
-        List<WorkgroupConfig> listWorkgroups = config.getWorkgroups(  );
+        TaskReassignmentConfig reassignmentConfig = getConfigBean( config );
 
-        if ( listWorkgroups != null )
+        if ( reassignmentConfig != null )
         {
-            for ( WorkgroupConfig workgroupConfig : listWorkgroups )
+            List<WorkgroupConfig> listWorkgroups = reassignmentConfig.getWorkgroups(  );
+
+            if ( listWorkgroups != null )
             {
-                _workgroupConfigService.create( workgroupConfig, workflowPlugin );
+                for ( WorkgroupConfig workgroupConfig : listWorkgroups )
+                {
+                    _workgroupConfigService.create( workgroupConfig, WorkflowUtils.getPlugin(  ) );
+                }
             }
         }
     }
@@ -104,11 +114,11 @@ public class TaskReassignmentConfigService implements ITaskReassignmentConfigSer
      * {@inheritDoc}
      */
     @Override
-    @Transactional( "workflow-reassignment.transactionManager" )
-    public void remove( int nIdTask, Plugin plugin, Plugin workflowPlugin )
+    @Transactional( ReassignmentPlugin.BEAN_TRANSACTION_MANAGER )
+    public void remove( int nIdTask )
     {
-        _workgroupConfigService.removeByTask( nIdTask, workflowPlugin );
-        _taskReassignmentConfigDAO.delete( nIdTask, plugin );
+        _workgroupConfigService.removeByTask( nIdTask, WorkflowUtils.getPlugin(  ) );
+        super.remove( nIdTask );
     }
 
     // Finders
@@ -117,15 +127,15 @@ public class TaskReassignmentConfigService implements ITaskReassignmentConfigSer
      * {@inheritDoc}
      */
     @Override
-    public TaskReassignmentConfig findByPrimaryKey( int nIdTask, Plugin plugin, Plugin workflowPlugin )
+    public <T> T findByPrimaryKey( int nIdTask )
     {
-        TaskReassignmentConfig config = _taskReassignmentConfigDAO.load( nIdTask, plugin );
+        TaskReassignmentConfig config = super.findByPrimaryKey( nIdTask );
 
         if ( config != null )
         {
-            config.setWorkgroups( _workgroupConfigService.getListByConfig( nIdTask, workflowPlugin ) );
+            config.setWorkgroups( _workgroupConfigService.getListByConfig( nIdTask, WorkflowUtils.getPlugin(  ) ) );
         }
 
-        return config;
+        return (T) config;
     }
 }

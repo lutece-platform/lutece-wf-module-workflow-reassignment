@@ -33,7 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.reassignment.business;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.plugins.workflow.modules.reassignment.service.ReassignmentPlugin;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.util.sql.DAOUtil;
 
 
@@ -42,7 +43,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
  * TaskReassignmentConfigDAO
  *
  */
-public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
+public class TaskReassignmentConfigDAO implements ITaskConfigDAO<TaskReassignmentConfig>
 {
     private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_task, title,is_notify,message,subject,is_use_user_name " +
         " FROM workflow_task_reassignment_cf WHERE id_task=?";
@@ -56,9 +57,9 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( TaskReassignmentConfig config, Plugin plugin )
+    public synchronized void insert( TaskReassignmentConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, ReassignmentPlugin.getPlugin(  ) );
 
         int nPos = 0;
 
@@ -77,9 +78,9 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
      * {@inheritDoc}
      */
     @Override
-    public void store( TaskReassignmentConfig config, Plugin plugin )
+    public void store( TaskReassignmentConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, ReassignmentPlugin.getPlugin(  ) );
 
         int nPos = 0;
 
@@ -99,10 +100,10 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
      * {@inheritDoc}
      */
     @Override
-    public TaskReassignmentConfig load( int nIdTask, Plugin plugin )
+    public TaskReassignmentConfig load( int nIdTask )
     {
         TaskReassignmentConfig config = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, ReassignmentPlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdTask );
 
@@ -130,9 +131,9 @@ public class TaskReassignmentConfigDAO implements ITaskReassignmentConfigDAO
      * {@inheritDoc}
      */
     @Override
-    public void delete( int nIdTask, Plugin plugin )
+    public void delete( int nIdTask )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, ReassignmentPlugin.getPlugin(  ) );
 
         daoUtil.setInt( 1, nIdTask );
         daoUtil.executeUpdate(  );

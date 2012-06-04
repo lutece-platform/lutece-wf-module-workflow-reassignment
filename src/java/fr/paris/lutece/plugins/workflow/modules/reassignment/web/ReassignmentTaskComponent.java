@@ -35,12 +35,11 @@ package fr.paris.lutece.plugins.workflow.modules.reassignment.web;
 
 import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
 import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig;
-import fr.paris.lutece.plugins.workflow.modules.reassignment.service.ITaskReassignmentConfigService;
-import fr.paris.lutece.plugins.workflow.modules.reassignment.service.ReassignmentPlugin;
-import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
+import fr.paris.lutece.plugins.workflow.modules.reassignment.service.TaskReassignmentConfigService;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflow.web.task.AbstractTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.plugins.workflowcore.web.task.TaskComponent;
 import fr.paris.lutece.portal.business.mailinglist.MailingList;
 import fr.paris.lutece.portal.business.mailinglist.MailingListHome;
 import fr.paris.lutece.portal.business.workgroup.AdminWorkgroup;
@@ -48,8 +47,6 @@ import fr.paris.lutece.portal.business.workgroup.AdminWorkgroupHome;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -64,6 +61,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -73,7 +71,7 @@ import javax.servlet.http.HttpServletRequest;
  * ReassignmentTaskComponent
  *
  */
-public class ReassignmentTaskComponent extends TaskComponent
+public class ReassignmentTaskComponent extends AbstractTaskComponent
 {
     // TEMPLATES
     private static final String TEMPLATE_TASK_REASSIGNMENT_CONFIG = "admin/plugins/workflow/modules/reassignment/task_reassignment_config.html";
@@ -112,7 +110,8 @@ public class ReassignmentTaskComponent extends TaskComponent
 
     // SERVICES
     @Inject
-    private ITaskReassignmentConfigService _taskReassignementConfigService;
+    @Named( TaskReassignmentConfigService.BEAN_SERVICE )
+    private ITaskConfigService _taskReassignementConfigService;
 
     /**
      * {@inheritDoc}
@@ -151,10 +150,7 @@ public class ReassignmentTaskComponent extends TaskComponent
                 AdminMessage.TYPE_STOP );
         }
 
-        Plugin reassignPlugin = PluginService.getPlugin( ReassignmentPlugin.PLUGIN_NAME );
-        Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
-        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ),
-                reassignPlugin, workflowPlugin );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ) );
         Boolean bCreate = false;
 
         if ( config == null )
@@ -204,11 +200,11 @@ public class ReassignmentTaskComponent extends TaskComponent
 
         if ( bCreate )
         {
-            _taskReassignementConfigService.create( config, reassignPlugin, workflowPlugin );
+            _taskReassignementConfigService.create( config );
         }
         else
         {
-            _taskReassignementConfigService.update( config, reassignPlugin, workflowPlugin );
+            _taskReassignementConfigService.update( config );
         }
 
         return null;
@@ -221,12 +217,9 @@ public class ReassignmentTaskComponent extends TaskComponent
     public String doValidateTask( int nIdResource, String strResourceType, HttpServletRequest request, Locale locale,
         ITask task )
     {
-        Plugin reassignPlugin = PluginService.getPlugin( ReassignmentPlugin.PLUGIN_NAME );
-        Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
         String strError = StringUtils.EMPTY;
         String[] tabWorkgroups = request.getParameterValues( PARAMETER_WORKGROUPS + "_" + task.getId(  ) );
-        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ),
-                reassignPlugin, workflowPlugin );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ) );
 
         if ( config == null )
         {
@@ -258,11 +251,7 @@ public class ReassignmentTaskComponent extends TaskComponent
     {
         String strNothing = I18nService.getLocalizedString( PROPERTY_SELECT_EMPTY_CHOICE, locale );
 
-        Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
-        Plugin reassignPlugin = PluginService.getPlugin( ReassignmentPlugin.PLUGIN_NAME );
-
-        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ),
-                reassignPlugin, workflowPlugin );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ) );
 
         List<Map<String, Object>> listWorkgroups = new ArrayList<Map<String, Object>>(  );
 
@@ -316,12 +305,8 @@ public class ReassignmentTaskComponent extends TaskComponent
     public String getDisplayTaskForm( int nIdResource, String strResourceType, HttpServletRequest request,
         Locale locale, ITask task )
     {
-        Plugin reassignPlugin = PluginService.getPlugin( ReassignmentPlugin.PLUGIN_NAME );
-        Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
-
         Map<String, Object> model = new HashMap<String, Object>(  );
-        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ),
-                reassignPlugin, workflowPlugin );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ) );
 
         model.put( MARK_CONFIG, config );
         model.put( MARK_WORKGROUP_LIST, AdminWorkgroupHome.findAll(  ) );

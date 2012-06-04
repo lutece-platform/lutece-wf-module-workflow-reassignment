@@ -22,13 +22,16 @@
  		p:key="taskReassignment"
  		p:titleI18nKey="module.workflow.reassignment.task_title"
  		p:beanName="workflow-reassignment.taskReassignment"
+ 		p:configBeanName="workflow-reassignment.taskReassignmentConfig"
  		p:configRequired="true"
  		p:formTaskRequired="true" />
  	<bean id="workflow-reassignment.taskReassignment" class="fr.paris.lutece.plugins.workflow.modules.reassignment.service.TaskReassignment" scope="prototype" />
+ 	<bean id="workflow-reassignment.taskReassignmentConfig" class="fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig" scope="prototype" />
  	<bean id="workflow-reassignment.reassignmentTaskComponent" class="fr.paris.lutece.plugins.workflow.modules.reassignment.web.ReassignmentTaskComponent"
- 		p:taskType-ref="workflow-reassignment.taskTypeReassignment" />
+ 		p:taskType-ref="workflow-reassignment.taskTypeReassignment"
+ 		p:taskConfigService-ref="workflow-reassignment.taskReassignmentConfigService" />
  		
  	<!-- Services -->
- 	<bean id="workflow-reassignment.taskReassignmentConfigService" class="fr.paris.lutece.plugins.workflow.modules.reassignment.service.TaskReassignmentConfigService" />
+ 	<bean id="workflow-reassignment.taskReassignmentConfigService" class="fr.paris.lutece.plugins.workflow.modules.reassignment.service.TaskReassignmentConfigService"
+ 		p:taskConfigDAO-ref="workflow-reassignment.taskReassignmentConfigDAO" />
 </beans>
- 	
