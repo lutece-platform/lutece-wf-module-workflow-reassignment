@@ -36,15 +36,19 @@ package fr.paris.lutece.plugins.workflow.modules.reassignment.service;
 import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
 import fr.paris.lutece.plugins.workflow.modules.assignment.service.IWorkgroupConfigService;
 import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig;
+import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfigDAO;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
 import fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService;
 
-import org.springframework.transaction.annotation.Transactional;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.transaction.Transactional;
 
 
 /**
@@ -52,6 +56,8 @@ import javax.inject.Inject;
  * TaskReassignmentConfigService
  *
  */
+@ApplicationScoped
+@Named( TaskReassignmentConfigService.BEAN_SERVICE )
 public class TaskReassignmentConfigService extends TaskConfigService
 {
     public static final String BEAN_SERVICE = "workflow-reassignment.taskReassignmentConfigService";
@@ -59,10 +65,29 @@ public class TaskReassignmentConfigService extends TaskConfigService
     private IWorkgroupConfigService _workgroupConfigService;
 
     /**
+     * Constructor for the CDI proxy.
+     */
+    TaskReassignmentConfigService( )
+    {
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param taskReassignmentConfigDAO
+     *            the config DAO
+     */
+    @Inject
+    public TaskReassignmentConfigService( @Named( TaskReassignmentConfigDAO.BEAN_NAME ) ITaskConfigDAO<TaskReassignmentConfig> taskReassignmentConfigDAO )
+    {
+        setTaskConfigDAO( (ITaskConfigDAO) taskReassignmentConfigDAO );
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    @Transactional( ReassignmentPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     public void create( ITaskConfig config )
     {
         super.create( config );
@@ -77,6 +102,7 @@ public class TaskReassignmentConfigService extends TaskConfigService
             {
                 for ( WorkgroupConfig workgroupConfig : listWorkgroups )
                 {
+                    workgroupConfig.setIdTask( config.getIdTask(  ) );
                     _workgroupConfigService.create( workgroupConfig, WorkflowUtils.getPlugin(  ) );
                 }
             }
@@ -87,7 +113,7 @@ public class TaskReassignmentConfigService extends TaskConfigService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( ReassignmentPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     public void update( ITaskConfig config )
     {
         super.update( config );
@@ -114,7 +140,7 @@ public class TaskReassignmentConfigService extends TaskConfigService
      * {@inheritDoc}
      */
     @Override
-    @Transactional( ReassignmentPlugin.BEAN_TRANSACTION_MANAGER )
+    @Transactional
     public void remove( int nIdTask )
     {
         _workgroupConfigService.removeByTask( nIdTask, WorkflowUtils.getPlugin(  ) );

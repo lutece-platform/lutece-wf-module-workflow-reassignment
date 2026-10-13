@@ -1,15 +1,11 @@
-<#if config?exists>	
-	<p>	
-		<label for="">#i18n{module.workflow.reassignment.form.label_reaffect}* :</label><br/>
-	</p>
-	<#list workgroup_list as workgroup>
-		<p>
-			<label for="document_type">&nbsp;</label>
-			<input name="workgroups_${config.idTask}" class="checkbox" value="${workgroup.key}" type="checkbox" />${workgroup.description}
-		</p>		
-	</#list>
-	<br/>
-	<p><label>&nbsp;</label>
-	#i18n{module.workflow.reassignment.form.label_workgroups_comment}
-	</p>
+<#if config??>
+	<@formGroup labelKey='#i18n{module.workflow.reassignment.form.label_reaffect}' helpKey='#i18n{module.workflow.reassignment.form.label_workgroups_comment}' mandatory=true>
+		<#if workgroup_list?has_content>
+			<#list workgroup_list as workgroup>
+				<@checkBox orientation='switch' name='workgroups_${config.idTask}' id='workgroups_${config.idTask}_${workgroup.key}' labelKey=workgroup.description!workgroup.key value=workgroup.key />
+			</#list>
+		<#else>
+			<@empty title='#i18n{portal.util.labelNoItem}' iconName='users-minus' subtitle=' ' />
+		</#if>
+	</@formGroup>
 </#if>

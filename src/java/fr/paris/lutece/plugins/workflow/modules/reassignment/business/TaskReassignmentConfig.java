@@ -36,6 +36,9 @@ package fr.paris.lutece.plugins.workflow.modules.reassignment.business;
 import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
 import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Named;
+
 import java.util.List;
 
 
@@ -44,6 +47,8 @@ import java.util.List;
  * TaskReassignmentConfig
  *
  */
+@Dependent
+@Named( "workflow-reassignment.taskReassignmentConfig" )
 public class TaskReassignmentConfig extends TaskConfig
 {
     private String _strTitle;

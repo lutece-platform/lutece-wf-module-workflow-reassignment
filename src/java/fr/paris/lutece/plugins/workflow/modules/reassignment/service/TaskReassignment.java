@@ -37,7 +37,6 @@ import fr.paris.lutece.plugins.workflow.modules.assignment.business.AssignmentHi
 import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
 import fr.paris.lutece.plugins.workflow.modules.assignment.service.IAssignmentHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.assignment.service.IWorkgroupConfigService;
-import fr.paris.lutece.plugins.workflow.modules.comment.business.TaskCommentConfig;
 import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig;
 import fr.paris.lutece.plugins.workflow.service.WorkflowPlugin;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
@@ -56,9 +55,10 @@ import fr.paris.lutece.portal.service.mailinglist.AdminMailingListService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,10 +67,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**
@@ -78,6 +79,8 @@ import javax.servlet.http.HttpServletRequest;
  * TaskReassignment
  *
  */
+@Dependent
+@Named( "workflow-reassignment.taskReassignment" )
 public class TaskReassignment extends Task
 {
     // PARAMETERS
@@ -92,16 +95,10 @@ public class TaskReassignment extends Task
     // MESSAGES
     private static final String PROPERTY_MAIL_SENDER_NAME = "module.workflow.assignment.task_assignment_config.mailSenderName";
 
-    // BEANS
-    private static final String BEAN_COMMENT_CONFIG_SERVICE = "workflow.taskCommentConfigService";
-
     // SERVICES
     @Inject
     @Named( TaskReassignmentConfigService.BEAN_SERVICE )
     private ITaskConfigService _taskReassignementConfigService;
-    @Inject
-    @Named( BEAN_COMMENT_CONFIG_SERVICE )
-    private ITaskConfigService _taskCommentConfigService;
     @Inject
     private IAssignmentHistoryService _assignmentHistoryService;
     @Inject
@@ -123,7 +120,8 @@ public class TaskReassignment extends Task
      * {@inheritDoc}
      */
     @Override
-    public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
+    public boolean processTaskWithResult( int nIdResource, String strResourceType, int nIdResourceHistory, HttpServletRequest request, Locale locale,
+            User user )
     {
         Plugin workflowPlugin = PluginService.getPlugin( WorkflowPlugin.PLUGIN_NAME );
         String[] tabWorkgroups = request.getParameterValues( PARAMETER_WORKGROUPS + "_" + this.getId(  ) );
@@ -191,6 +189,8 @@ public class TaskReassignment extends Task
                 resourceHistory.getResourceType(  ), resourceHistory.getWorkflow(  ).getId(  ) );
         resourceWorkflow.setWorkgroups( listWorkgroup );
         _resourceWorkflowService.update( resourceWorkflow );
+
+        return true;
     }
 
     /**
@@ -242,7 +242,7 @@ public class TaskReassignment extends Task
     public Map<String, String> getTaskFormEntries( Locale locale )
     {
         Map<String, String> mapListEntriesform = null;
-        TaskCommentConfig config = _taskCommentConfigService.findByPrimaryKey( this.getId(  ) );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( this.getId(  ) );
 
         if ( config != null )
         {

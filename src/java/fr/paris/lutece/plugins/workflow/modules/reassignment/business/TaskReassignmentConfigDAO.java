@@ -37,14 +37,21 @@ import fr.paris.lutece.plugins.workflow.modules.reassignment.service.Reassignmen
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+
 
 /**
  *
  * TaskReassignmentConfigDAO
  *
  */
+@ApplicationScoped
+@Named( TaskReassignmentConfigDAO.BEAN_NAME )
 public class TaskReassignmentConfigDAO implements ITaskConfigDAO<TaskReassignmentConfig>
 {
+    public static final String BEAN_NAME = "workflow-reassignment.taskReassignmentConfigDAO";
+
     private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_task, title,is_notify,message,subject,is_use_user_name " +
         " FROM workflow_task_reassignment_cf WHERE id_task=?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO  workflow_task_reassignment_cf  " +
@@ -57,21 +64,21 @@ public class TaskReassignmentConfigDAO implements ITaskConfigDAO<TaskReassignmen
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( TaskReassignmentConfig config )
+    public void insert( TaskReassignmentConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, ReassignmentPlugin.getPlugin(  ) );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, ReassignmentPlugin.getPlugin(  ) ) )
+        {
+            int nPos = 0;
 
-        int nPos = 0;
+            daoUtil.setInt( ++nPos, config.getIdTask(  ) );
+            daoUtil.setString( ++nPos, config.getTitle(  ) );
+            daoUtil.setBoolean( ++nPos, config.isNotify(  ) );
+            daoUtil.setString( ++nPos, config.getMessage(  ) );
+            daoUtil.setString( ++nPos, config.getSubject(  ) );
+            daoUtil.setBoolean( ++nPos, config.isUseUserName(  ) );
 
-        daoUtil.setInt( ++nPos, config.getIdTask(  ) );
-        daoUtil.setString( ++nPos, config.getTitle(  ) );
-        daoUtil.setBoolean( ++nPos, config.isNotify(  ) );
-        daoUtil.setString( ++nPos, config.getMessage(  ) );
-        daoUtil.setString( ++nPos, config.getSubject(  ) );
-        daoUtil.setBoolean( ++nPos, config.isUseUserName(  ) );
-
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+            daoUtil.executeUpdate(  );
+        }
     }
 
     /**
@@ -80,20 +87,20 @@ public class TaskReassignmentConfigDAO implements ITaskConfigDAO<TaskReassignmen
     @Override
     public void store( TaskReassignmentConfig config )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, ReassignmentPlugin.getPlugin(  ) );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, ReassignmentPlugin.getPlugin(  ) ) )
+        {
+            int nPos = 0;
 
-        int nPos = 0;
+            daoUtil.setInt( ++nPos, config.getIdTask(  ) );
+            daoUtil.setString( ++nPos, config.getTitle(  ) );
+            daoUtil.setBoolean( ++nPos, config.isNotify(  ) );
+            daoUtil.setString( ++nPos, config.getMessage(  ) );
+            daoUtil.setString( ++nPos, config.getSubject(  ) );
+            daoUtil.setBoolean( ++nPos, config.isUseUserName(  ) );
 
-        daoUtil.setInt( ++nPos, config.getIdTask(  ) );
-        daoUtil.setString( ++nPos, config.getTitle(  ) );
-        daoUtil.setBoolean( ++nPos, config.isNotify(  ) );
-        daoUtil.setString( ++nPos, config.getMessage(  ) );
-        daoUtil.setString( ++nPos, config.getSubject(  ) );
-        daoUtil.setBoolean( ++nPos, config.isUseUserName(  ) );
-
-        daoUtil.setInt( ++nPos, config.getIdTask(  ) );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+            daoUtil.setInt( ++nPos, config.getIdTask(  ) );
+            daoUtil.executeUpdate(  );
+        }
     }
 
     /**
@@ -103,26 +110,25 @@ public class TaskReassignmentConfigDAO implements ITaskConfigDAO<TaskReassignmen
     public TaskReassignmentConfig load( int nIdTask )
     {
         TaskReassignmentConfig config = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, ReassignmentPlugin.getPlugin(  ) );
-
-        daoUtil.setInt( 1, nIdTask );
-
-        daoUtil.executeQuery(  );
-
-        int nPos = 0;
-
-        if ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, ReassignmentPlugin.getPlugin(  ) ) )
         {
-            config = new TaskReassignmentConfig(  );
-            config.setIdTask( daoUtil.getInt( ++nPos ) );
-            config.setTitle( daoUtil.getString( ++nPos ) );
-            config.setNotify( daoUtil.getBoolean( ++nPos ) );
-            config.setMessage( daoUtil.getString( ++nPos ) );
-            config.setSubject( daoUtil.getString( ++nPos ) );
-            config.setUseUserName( daoUtil.getBoolean( ++nPos ) );
-        }
+            daoUtil.setInt( 1, nIdTask );
 
-        daoUtil.free(  );
+            daoUtil.executeQuery(  );
+
+            int nPos = 0;
+
+            if ( daoUtil.next(  ) )
+            {
+                config = new TaskReassignmentConfig(  );
+                config.setIdTask( daoUtil.getInt( ++nPos ) );
+                config.setTitle( daoUtil.getString( ++nPos ) );
+                config.setNotify( daoUtil.getBoolean( ++nPos ) );
+                config.setMessage( daoUtil.getString( ++nPos ) );
+                config.setSubject( daoUtil.getString( ++nPos ) );
+                config.setUseUserName( daoUtil.getBoolean( ++nPos ) );
+            }
+        }
 
         return config;
     }
@@ -133,10 +139,10 @@ public class TaskReassignmentConfigDAO implements ITaskConfigDAO<TaskReassignmen
     @Override
     public void delete( int nIdTask )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, ReassignmentPlugin.getPlugin(  ) );
-
-        daoUtil.setInt( 1, nIdTask );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, ReassignmentPlugin.getPlugin(  ) ) )
+        {
+            daoUtil.setInt( 1, nIdTask );
+            daoUtil.executeUpdate(  );
+        }
     }
 }

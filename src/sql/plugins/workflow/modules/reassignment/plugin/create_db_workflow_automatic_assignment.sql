@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+-- changeset workflow-reassignment:create_db_workflow_automatic_assignment.sql
+-- preconditions onFail:MARK_RAN onError:WARN
+-- precondition-sql-check expectedResult:1 SELECT COUNT(*) FROM workflow_task_reassignment_cf WHERE 1 = 0
 DROP TABLE IF EXISTS workflow_task_reassignment_cf;
 
 
