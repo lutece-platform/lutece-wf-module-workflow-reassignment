@@ -1,1 +1,7 @@
 /nb-configuration.xml
+target/
+logs/
+java.io.tmpdir/
+.migration/
+*.log
+e2e/

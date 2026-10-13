@@ -33,26 +33,31 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.reassignment.web;
 
+import fr.paris.lutece.plugins.workflow.modules.assignment.business.AssignmentHistory;
 import fr.paris.lutece.plugins.workflow.modules.assignment.business.WorkgroupConfig;
+import fr.paris.lutece.plugins.workflow.modules.assignment.service.IAssignmentHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.reassignment.business.TaskReassignmentConfig;
 import fr.paris.lutece.plugins.workflow.modules.reassignment.service.TaskReassignmentConfigService;
+import fr.paris.lutece.plugins.workflow.modules.reassignment.service.TaskTypeReassignmentProducer;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflow.web.task.AbstractTaskComponent;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.portal.business.mailinglist.MailingList;
-import fr.paris.lutece.portal.business.mailinglist.MailingListHome;
-import fr.paris.lutece.portal.business.workgroup.AdminWorkgroup;
+import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.business.workgroup.AdminWorkgroupHome;
+import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.mailinglist.AdminMailingListService;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
+import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.xml.XmlUtil;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,10 +65,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**
@@ -71,6 +77,8 @@ import javax.servlet.http.HttpServletRequest;
  * ReassignmentTaskComponent
  *
  */
+@ApplicationScoped
+@Named( "workflow-reassignment.reassignmentTaskComponent" )
 public class ReassignmentTaskComponent extends AbstractTaskComponent
 {
     // TEMPLATES
@@ -104,14 +112,35 @@ public class ReassignmentTaskComponent extends AbstractTaskComponent
     private static final String MESSAGE_NO_CONFIGURATION_FOR_TASK_ASSIGNMENT = "module.workflow.assignment.task_assignment_config.message.no_configuration_for_task_comment";
     private static final String MESSAGE_NO_MAILINGLIST_FOR_WORKGROUP = "module.workflow.assignment.task_assignment_config.message.no_mailinglist_for_workgroup";
 
-    // XML TAGS
-    private static final String TAG_ASSIGNMENT = "assignment";
-    private static final String TAG_LIST_WORKGROUP = "list-workgroup";
-
     // SERVICES
     @Inject
     @Named( TaskReassignmentConfigService.BEAN_SERVICE )
     private ITaskConfigService _taskReassignementConfigService;
+    @Inject
+    private IAssignmentHistoryService _assignmentHistoryService;
+
+    /**
+     * Constructor for the CDI proxy.
+     */
+    ReassignmentTaskComponent( )
+    {
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param taskType
+     *            the task type
+     * @param taskConfigService
+     *            the task config service
+     */
+    @Inject
+    public ReassignmentTaskComponent( @Named( TaskTypeReassignmentProducer.BEAN_TASK_TYPE ) ITaskType taskType,
+            @Named( TaskReassignmentConfigService.BEAN_SERVICE ) ITaskConfigService taskConfigService )
+    {
+        setTaskType( taskType );
+        setTaskConfigService( taskConfigService );
+    }
 
     /**
      * {@inheritDoc}
@@ -250,13 +279,19 @@ public class ReassignmentTaskComponent extends AbstractTaskComponent
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
         String strNothing = I18nService.getLocalizedString( PROPERTY_SELECT_EMPTY_CHOICE, locale );
+        AdminUser user = AdminUserService.getAdminUser( request );
 
         TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ) );
 
         List<Map<String, Object>> listWorkgroups = new ArrayList<Map<String, Object>>(  );
 
-        for ( AdminWorkgroup workgroup : AdminWorkgroupHome.findAll(  ) )
+        for ( ReferenceItem workgroup : AdminWorkgroupService.getUserWorkgroups( user, locale ) )
         {
+            if ( AdminWorkgroupService.ALL_GROUPS.equals( workgroup.getCode(  ) ) )
+            {
+                continue;
+            }
+
             Map<String, Object> workgroupsItem = new HashMap<String, Object>(  );
             workgroupsItem.put( MARK_ITEM, workgroup );
 
@@ -264,7 +299,7 @@ public class ReassignmentTaskComponent extends AbstractTaskComponent
             {
                 for ( WorkgroupConfig workgroupSelected : config.getWorkgroups(  ) )
                 {
-                    if ( workgroup.getKey(  ).equals( workgroupSelected.getWorkgroupKey(  ) ) )
+                    if ( workgroup.getCode(  ).equals( workgroupSelected.getWorkgroupKey(  ) ) )
                     {
                         workgroupsItem.put( MARK_CONFIG, workgroupSelected );
 
@@ -278,15 +313,7 @@ public class ReassignmentTaskComponent extends AbstractTaskComponent
 
         ReferenceList refMailingList = new ReferenceList(  );
         refMailingList.addItem( WorkflowUtils.CONSTANT_ID_NULL, strNothing );
-
-        ReferenceList refMailList = new ReferenceList(  );
-
-        for ( MailingList mailingList : MailingListHome.findAll(  ) )
-        {
-            refMailList.addItem( mailingList.getId(  ), mailingList.getName(  ) );
-        }
-
-        refMailingList.addAll( refMailList );
+        refMailingList.addAll( AdminMailingListService.getMailingLists( user ) );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_WORKGROUP_LIST, listWorkgroups );
@@ -322,10 +349,26 @@ public class ReassignmentTaskComponent extends AbstractTaskComponent
     @Override
     public String getDisplayTaskInformation( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
     {
-        Map<String, Object> model = new HashMap<String, Object>(  );
+        List<AssignmentHistory> listAssignmentHistory = _assignmentHistoryService.getListByHistory( nIdHistory, task.getId(  ),
+                WorkflowUtils.getPlugin(  ) );
+        TaskReassignmentConfig config = _taskReassignementConfigService.findByPrimaryKey( task.getId(  ) );
 
         ReferenceList refWorkgroups = new ReferenceList(  );
 
+        for ( ReferenceItem workgroup : AdminWorkgroupService.getUserWorkgroups( AdminUserService.getAdminUser( request ), locale ) )
+        {
+            for ( AssignmentHistory assignmentHistory : listAssignmentHistory )
+            {
+                if ( !AdminWorkgroupService.ALL_GROUPS.equals( workgroup.getCode(  ) )
+                        && workgroup.getCode(  ).equals( assignmentHistory.getWorkgroup(  ) ) )
+                {
+                    refWorkgroups.add( workgroup );
+                }
+            }
+        }
+
+        Map<String, Object> model = new HashMap<String, Object>(  );
+        model.put( MARK_CONFIG, config );
         model.put( MARK_WORKGROUP_LIST, refWorkgroups );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_ASSIGNMENT_INFORMATION, locale, model );
@@ -333,20 +376,4 @@ public class ReassignmentTaskComponent extends AbstractTaskComponent
         return template.getHtml(  );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
-    {
-        StringBuffer strXml = new StringBuffer(  );
-
-        XmlUtil.beginElement( strXml, TAG_ASSIGNMENT );
-        XmlUtil.beginElement( strXml, TAG_LIST_WORKGROUP );
-
-        XmlUtil.endElement( strXml, TAG_LIST_WORKGROUP );
-        XmlUtil.endElement( strXml, TAG_ASSIGNMENT );
-
-        return strXml.toString(  );
-    }
 }
